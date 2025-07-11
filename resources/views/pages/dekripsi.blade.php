@@ -3,44 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FILE DECRYPTION - Security System</title>
+    <title>FILE DECRYPTION - School Security System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <style>
-        .font-orbitron { font-family: 'Orbitron', monospace; }
-        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
 
-        .matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            opacity: 0.08;
+
+
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(20px) rotate(240deg); }
         }
 
-        .grid-pattern {
+        .geometric-pattern {
             background-image:
-                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
-            animation: gridPulse 4s ease-in-out infinite;
+                radial-gradient(circle at 25% 25%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            background-size: 60px 60px;
+            animation: patternMove 10s linear infinite;
         }
 
-        @keyframes gridPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.1; }
+        @keyframes patternMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 60px 60px; }
         }
 
-        .glow-cyan {
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.15), inset 0 0 30px rgba(0, 255, 255, 0.05);
+        .glow-red {
+            box-shadow: 0 0 30px rgba(220, 38, 38, 0.2), inset 0 0 30px rgba(220, 38, 38, 0.05);
         }
 
-        .text-glow {
-            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        .text-glow-red {
+            text-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+        }
+
+        .text-glow-white {
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
         }
 
         .pulse-dot {
@@ -48,9 +51,9 @@
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
         }
 
         .processing-animation {
@@ -63,34 +66,51 @@
         }
 
         .file-drop-zone {
-            border: 2px dashed rgba(0, 255, 255, 0.3);
+            border: 2px dashed rgba(220, 38, 38, 0.3);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-drop-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .file-drop-zone:hover::before {
+            left: 100%;
         }
 
         .file-drop-zone.dragover {
-            border-color: #00ffff;
-            background-color: rgba(0, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            border-color: #dc2626;
+            background-color: rgba(220, 38, 38, 0.1);
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
         }
 
         .btn-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
         }
 
         .input-focus:focus {
-            border-color: #00ffff;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-            background-color: rgba(0, 255, 255, 0.05);
+            border-color: #dc2626;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+            background-color: rgba(220, 38, 38, 0.05);
         }
 
         .terminal-output {
-            font-family: 'Roboto Mono', monospace;
+            font-family: 'Inter', sans-serif;
             font-size: 12px;
             line-height: 1.4;
-            color: #00ff00;
+            color: #22c55e;
             background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(0, 255, 0, 0.3);
+            border: 1px solid rgba(34, 197, 94, 0.3);
             border-radius: 8px;
             padding: 16px;
             max-height: 200px;
@@ -107,14 +127,52 @@
             white-space: nowrap;
             animation: typewriter 0.5s steps(40, end);
         }
+
+        .school-badge {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            border: 2px solid #ffffff;
+            animation: badgeGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes badgeGlow {
+            0% { box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.8), 0 0 30px rgba(220, 38, 38, 0.3); }
+        }
+
+        .patriotic-gradient {
+            /* background: linear-gradient(135deg, #dc2626 0%, #dc2626 50%, #dc2626 100%); */
+            background: #dc2626;
+            background-size: 400% 400%;
+            /* animation: patrioticFlow 4s ease-in-out infinite; */
+        }
+
+        @keyframes patrioticFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .book-icon {
+            animation: bookFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes bookFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-black via-slate-900 to-blue-900 min-h-screen py-8 overflow-x-hidden relative font-mono">
-    <!-- Matrix Background -->
-    <div class="matrix-bg" id="matrixBg"></div>
+<body class="bg-gradient-to-br from-red-50 via-white to-red-100 min-h-screen py-8 overflow-x-hidden relative font-inter">
+    <!-- Floating Shapes Background -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
 
-    <!-- Grid Overlay -->
-    <div class="fixed inset-0 grid-pattern z-10"></div>
+    <!-- Geometric Pattern Overlay -->
+    {{-- <div class="fixed inset-0 geometric-pattern z-10"></div> --}}
 
     <!-- Main Container -->
     <div class="container mx-auto px-4 relative z-20">
@@ -122,41 +180,45 @@
             <div class="max-w-6xl mx-auto px-4">
                 <div class="flex items-center justify-between">
                     <a href="/dashboard">
-                    <div class="font-orbitron text-2xl font-bold text-cyan-400 text-glow">
-                        🔐 SECURES SYSTEM
-                    </div>
+                        <div class="font-poppins text-2xl font-bold text-red-600 text-glow-red flex items-center">
+                            <span class="w-10 h-10 rounded-full flex items-center justify-center mr-3 text-white">🔐</span>
+                            SECURITY SYSTEM
+                        </div>
                     </a>
                     <a href="/enkripsi">
-                    <div class="text-green-400 text-sm">
-                        <span class="text-cyan-400">></span> FILE DECRYPTION MODULE
-                    </div>
+                        <div class="text-red-500 text-sm font-medium">
+                            <span class="text-red-600 font-bold">></span> FILE DECRYPTION MODULE
+                        </div>
                     </a>
                 </div>
             </div>
         </nav>
+
         <!-- Header -->
         <div class="text-center mb-8">
-            <div class="font-orbitron text-5xl font-black text-cyan-400 text-glow mb-4">
+            <div class="font-poppins text-5xl font-black text-red-600 text-glow-red mb-4 flex items-center justify-center">
+                <span class="book-icon mr-4">📚</span>
                 FILE DECRYPTION
+                <span class="book-icon ml-4">🔐</span>
             </div>
-            <div class="text-green-400 text-lg opacity-80 tracking-widest">
-                SECURE FILE DECRYPTION SYSTEM
+            <div class="text-red-500 text-lg opacity-80 tracking-wide font-medium">
+                SECURE EDUCATIONAL FILE DECRYPTION SYSTEM
             </div>
-            <div class="text-cyan-400 text-sm mt-2 opacity-60">
-                <span class="text-green-400">></span> Decrypt your .enc files with authorized key
+            <div class="text-red-400 text-sm mt-2 opacity-60 font-medium">
+                <span class="text-red-500 font-bold">></span> Dekripsi file .enc dengan kunci yang terotorisasi
             </div>
         </div>
 
         <!-- System Status -->
         <div class="max-w-4xl mx-auto mb-8">
-            <div class="bg-black bg-opacity-80 backdrop-blur-lg border border-green-400 border-opacity-30 rounded-lg p-4">
+            <div class="bg-white bg-opacity-90 backdrop-blur-lg border border-red-200 rounded-lg p-4 shadow-lg">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <div class="w-3 h-3 bg-green-400 rounded-full mr-3 pulse-dot"></div>
-                        <span class="text-green-400 text-sm font-bold">DECRYPTION ENGINE: ONLINE</span>
+                        <div class="w-3 h-3 bg-green-500 rounded-full mr-3 pulse-dot"></div>
+                        <span class="text-green-600 text-sm font-bold">SISTEM DEKRIPSI: ONLINE</span>
                     </div>
-                    <div class="text-cyan-400 text-xs">
-                        SUPPORTED: AES-256, RSA-2048, ChaCha20
+                    <div class="text-red-500 text-xs font-medium">
+                        DIDUKUNG: AES-256, RSA-2048, ChaCha20
                     </div>
                 </div>
             </div>
@@ -164,58 +226,60 @@
 
         <!-- Main Content -->
         <div class="max-w-4xl mx-auto">
-            <div class="bg-black bg-opacity-80 backdrop-blur-lg border-2 border-cyan-400 border-opacity-30 rounded-2xl p-8 glow-cyan">
+            <div class="bg-white bg-opacity-95 backdrop-blur-lg border-2 border-red-200 rounded-2xl p-8 shadow-2xl glow-red">
 
                 <!-- File Upload Section -->
                 <div class="mb-8">
-                    <h2 class="text-cyan-400 text-xl font-bold mb-4 uppercase tracking-wide">
-                        📁 ENCRYPTED FILE UPLOAD
+                    <h2 class="text-red-600 text-xl font-bold mb-4 uppercase tracking-wide font-poppins flex items-center">
+                        <span class="mr-2">📁</span> UPLOAD FILE TERENKRIPSI
                     </h2>
 
-                    <div class="file-drop-zone bg-black bg-opacity-50 rounded-xl p-8 text-center cursor-pointer" id="dropZone">
-                        <div class="text-cyan-400 text-4xl mb-4">⬆️</div>
-                        <div class="text-cyan-400 text-lg font-bold mb-2">Drop .enc file here</div>
-                        <div class="text-gray-400 text-sm mb-4">or click to browse</div>
+                    <div class="file-drop-zone bg-red-50 rounded-xl p-8 text-center cursor-pointer relative" id="dropZone">
+                        <div class="text-red-500 text-4xl mb-4">⬆️</div>
+                        <div class="text-red-600 text-lg font-bold mb-2">Seret file .enc ke sini</div>
+                        <div class="text-gray-500 text-sm mb-4">atau klik untuk memilih file</div>
                         <input type="file" id="fileInput" accept=".enc" class="hidden">
-                        <button class="bg-cyan-400 bg-opacity-20 hover:bg-opacity-30 text-cyan-400 px-6 py-2 rounded-lg border border-cyan-400 border-opacity-50 transition-all">
-                            SELECT FILE
+                        <button class="patriotic-gradient text-white px-6 py-2 rounded-lg border-2 border-red-300 transition-all font-medium">
+                            PILIH FILE
                         </button>
                     </div>
 
                     <!-- File Info -->
-                    <div id="fileInfo" class="hidden mt-4 p-4 bg-green-400 bg-opacity-10 border border-green-400 border-opacity-30 rounded-lg">
-                        <div class="text-green-400 font-bold text-sm">✓ FILE LOADED</div>
-                        <div id="fileName" class="text-white text-sm mt-1"></div>
-                        <div id="fileSize" class="text-gray-400 text-xs mt-1"></div>
+                    <div id="fileInfo" class="hidden mt-4 p-4 bg-green-50 border border-green-300 rounded-lg">
+                        <div class="text-green-600 font-bold text-sm flex items-center">
+                            <span class="mr-2">✓</span> FILE BERHASIL DIMUAT
+                        </div>
+                        <div id="fileName" class="text-gray-700 text-sm mt-1 font-medium"></div>
+                        <div id="fileSize" class="text-gray-500 text-xs mt-1"></div>
                     </div>
                 </div>
 
                 <!-- Decryption Key Section -->
                 <div class="mb-8">
-                    <h2 class="text-cyan-400 text-xl font-bold mb-4 uppercase tracking-wide">
-                        🔑 DECRYPTION KEY
+                    <h2 class="text-red-600 text-xl font-bold mb-4 uppercase tracking-wide font-poppins flex items-center">
+                        <span class="mr-2">🔑</span> KUNCI DEKRIPSI
                     </h2>
 
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-cyan-400 text-sm font-bold mb-2 uppercase tracking-wide">
-                                ENTER DECRYPTION KEY
+                            <label class="block text-red-600 text-sm font-bold mb-2 uppercase tracking-wide">
+                                MASUKKAN KUNCI DEKRIPSI
                             </label>
                             <input
                                 type="password"
                                 id="decryptionKey"
-                                class="w-full px-4 py-3 bg-black bg-opacity-70 border-2 border-cyan-400 border-opacity-30 rounded-lg text-cyan-400 font-mono transition-all duration-300 focus:outline-none input-focus placeholder-cyan-400 placeholder-opacity-50"
-                                placeholder="Enter your decryption key..."
+                                class="w-full px-4 py-3 bg-white border-2 border-red-200 rounded-lg text-red-600 font-medium transition-all duration-300 focus:outline-none input-focus placeholder-red-300"
+                                placeholder="Masukkan kunci dekripsi Anda..."
                                 autocomplete="off"
                             >
                         </div>
 
                         <div class="flex items-center space-x-4">
-                            <button id="showKeyBtn" class="text-cyan-400 text-sm hover:text-white transition-colors">
-                                👁️ Show Key
+                            <button id="showKeyBtn" class="text-red-500 text-sm hover:text-red-700 transition-colors font-medium">
+                                👁️ Tampilkan Kunci
                             </button>
-                            <button id="generateKeyBtn" class="text-yellow-400 text-sm hover:text-white transition-colors">
-                                🎲 Generate Test Key
+                            <button id="generateKeyBtn" class="text-orange-500 text-sm hover:text-orange-700 transition-colors font-medium">
+                                🎲 Generate Kunci Test
                             </button>
                         </div>
                     </div>
@@ -225,56 +289,62 @@
                 <div class="mb-8">
                     <button
                         id="decryptBtn"
-                        class="w-full py-4 bg-gradient-to-r from-cyan-400 to-green-400 text-black font-orbitron font-bold text-lg uppercase tracking-widest rounded-lg transition-all duration-300 btn-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full py-4 patriotic-gradient text-white font-poppins font-bold text-lg uppercase tracking-widest rounded-lg transition-all duration-300 btn-hover disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                         disabled
                     >
-                        🔓 START DECRYPTION PROCESS
+                        🔓 MULAI PROSES DEKRIPSI
                     </button>
                 </div>
 
                 <!-- Processing Status -->
                 <div id="processingSection" class="hidden mb-8">
-                    <h3 class="text-cyan-400 text-lg font-bold mb-4">⚡ DECRYPTION IN PROGRESS</h3>
-                    <div class="bg-black bg-opacity-70 rounded-lg p-4">
-                        <div class="flex justify-between text-sm text-cyan-400 mb-2">
-                            <span>Processing...</span>
+                    <h3 class="text-red-600 text-lg font-bold mb-4 font-poppins flex items-center">
+                        <span class="mr-2">⚡</span> DEKRIPSI SEDANG BERLANGSUNG
+                    </h3>
+                    <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                        <div class="flex justify-between text-sm text-red-600 mb-2 font-medium">
+                            <span>Memproses...</span>
                             <span id="progressText">0%</span>
                         </div>
-                        <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-                            <div id="progressBar" class="h-full bg-gradient-to-r from-cyan-400 to-green-400 transition-all duration-300" style="width: 0%"></div>
+                        <div class="w-full h-2 bg-red-200 rounded-full overflow-hidden">
+                            <div id="progressBar" class="h-full patriotic-gradient transition-all duration-300" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Terminal Output -->
                 <div id="terminalSection" class="hidden mb-8">
-                    <h3 class="text-green-400 text-lg font-bold mb-4">💻 SYSTEM LOG</h3>
+                    <h3 class="text-green-600 text-lg font-bold mb-4 font-poppins flex items-center">
+                        <span class="mr-2">💻</span> LOG SISTEM
+                    </h3>
                     <div id="terminal" class="terminal-output">
-                        <div class="text-green-400">[SYSTEM] Decryption engine initialized...</div>
+                        <div class="text-green-500">[SISTEM] Engine dekripsi diinisialisasi...</div>
                     </div>
                 </div>
 
                 <!-- Download Section -->
                 <div id="downloadSection" class="hidden">
-                    <h3 class="text-green-400 text-lg font-bold mb-4">📥 DECRYPTED FILE READY</h3>
-                    <div class="bg-green-400 bg-opacity-10 border border-green-400 border-opacity-30 rounded-lg p-6 text-center">
-                        <div class="text-green-400 text-4xl mb-4">✅</div>
-                        <div class="text-green-400 font-bold text-lg mb-2">DECRYPTION SUCCESSFUL</div>
-                        <div class="text-gray-300 text-sm mb-4">Your file has been successfully decrypted</div>
-                        <button id="downloadBtn" class="bg-green-400 hover:bg-green-300 text-black font-bold py-3 px-6 rounded-lg transition-all">
-                            ⬇️ DOWNLOAD DECRYPTED FILE
+                    <h3 class="text-green-600 text-lg font-bold mb-4 font-poppins flex items-center">
+                        <span class="mr-2">📥</span> FILE TERDEKRIPSI SIAP
+                    </h3>
+                    <div class="bg-green-50 border border-green-300 rounded-lg p-6 text-center">
+                        <div class="text-green-500 text-4xl mb-4">✅</div>
+                        <div class="text-green-600 font-bold text-lg mb-2">DEKRIPSI BERHASIL</div>
+                        <div class="text-gray-600 text-sm mb-4">File Anda telah berhasil didekripsi</div>
+                        <button id="downloadBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg">
+                            ⬇️ UNDUH FILE TERDEKRIPSI
                         </button>
                     </div>
                 </div>
 
                 <!-- Error Section -->
                 <div id="errorSection" class="hidden">
-                    <div class="bg-red-400 bg-opacity-10 border border-red-400 border-opacity-30 rounded-lg p-6 text-center">
-                        <div class="text-red-400 text-4xl mb-4">❌</div>
-                        <div class="text-red-400 font-bold text-lg mb-2">DECRYPTION FAILED</div>
-                        <div id="errorMessage" class="text-gray-300 text-sm mb-4"></div>
-                        <button id="retryBtn" class="bg-red-400 hover:bg-red-300 text-black font-bold py-3 px-6 rounded-lg transition-all">
-                            🔄 TRY AGAIN
+                    <div class="bg-red-50 border border-red-300 rounded-lg p-6 text-center">
+                        <div class="text-red-500 text-4xl mb-4">❌</div>
+                        <div class="text-red-600 font-bold text-lg mb-2">DEKRIPSI GAGAL</div>
+                        <div id="errorMessage" class="text-gray-600 text-sm mb-4"></div>
+                        <button id="retryBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg">
+                            🔄 COBA LAGI
                         </button>
                     </div>
                 </div>
@@ -286,41 +356,14 @@
         let selectedFile = null;
         let blob = null;
 
-        // Matrix Rain Effect
-        function createMatrixRain() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            document.getElementById('matrixBg').appendChild(canvas);
-
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const chars = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{}|;:,.<>?';
-            const charArray = chars.split('');
-            const fontSize = 14;
-            const columns = canvas.width / fontSize;
-            const drops = Array(Math.floor(columns)).fill(1);
-
-            function draw() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = '#00ffff';
-                ctx.font = fontSize + 'px monospace';
-
-                drops.forEach((y, x) => {
-                    const text = charArray[Math.floor(Math.random() * charArray.length)];
-                    ctx.fillText(text, x * fontSize, y * fontSize);
-
-                    if (y * fontSize > canvas.height && Math.random() > 0.975) {
-                        drops[x] = 0;
-                    }
-                    drops[x]++;
-                });
-            }
-
-            setInterval(draw, 35);
-        }
+        // Floating Animation Control
+        // function enhanceFloatingShapes() {
+        //     const shapes = document.querySelectorAll('.shape');
+        //     shapes.forEach((shape, index) => {
+        //         shape.style.animationDelay = `${index * 0.5}s`;
+        //         shape.style.animationDuration = `${8 + index * 2}s`;
+        //     });
+        // }
 
         // File Drop Zone
         const dropZone = document.getElementById('dropZone');
@@ -355,13 +398,13 @@
             if (!file) return;
 
             if (!file.name.endsWith('.enc')) {
-                alert('Please select a .enc file');
+                alert('Silakan pilih file .enc');
                 return;
             }
 
             selectedFile = file;
             fileName.textContent = `📄 ${file.name}`;
-            fileSize.textContent = `📊 Size: ${(file.size / 1024).toFixed(2)} KB`;
+            fileSize.textContent = `📊 Ukuran: ${(file.size / 1024).toFixed(2)} KB`;
             fileInfo.classList.remove('hidden');
             updateDecryptButton();
         }
@@ -375,15 +418,15 @@
             const input = decryptionKey;
             if (input.type === 'password') {
                 input.type = 'text';
-                showKeyBtn.textContent = '🙈 Hide Key';
+                showKeyBtn.textContent = '🙈 Sembunyikan Kunci';
             } else {
                 input.type = 'password';
-                showKeyBtn.textContent = '👁️ Show Key';
+                showKeyBtn.textContent = '👁️ Tampilkan Kunci';
             }
         });
 
         generateKeyBtn.addEventListener('click', () => {
-            const testKey = 'demo-key-' + Math.random().toString(36).substr(2, 8);
+            const testKey = 'sekolah-key-' + Math.random().toString(36).substr(2, 8);
             decryptionKey.value = testKey;
             updateDecryptButton();
         });
@@ -421,131 +464,45 @@
             decryptBtn.disabled = true;
 
             const terminal = document.getElementById('terminal');
-    terminal.innerHTML = `<div class="text-green-400">[SYSTEM] Sending file to server for decryption...</div>`;
+            terminal.innerHTML = `<div class="text-green-500">[SISTEM] Mengirim file ke server untuk dekripsi...</div>`;
 
-    // Kirim ke Laravel
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("key", decryptionKey.value);
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            // Send to Laravel
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+            formData.append("key", decryptionKey.value);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    fetch("/decrypt", {
-        method: "POST",
-        body: formData,
-        headers: {
-                        "X-CSRF-TOKEN": csrfToken
-                    }
-
-    })
-    .then(response => {
-        if (!response.ok) throw new Error("Decryption failed on server.");
-        return response.blob();
-    })
-    .then(responseBlob  => {
-        blob = responseBlob;
-        const originalName = selectedFile.name.replace('.enc', '');
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = originalName;
-        a.click();
-
-        document.getElementById('processingSection').classList.add('hidden');
-        document.getElementById('downloadSection').classList.remove('hidden');
-        // document.getElementById('encryptedFileName').textContent = originalName;
-        decryptBtn.disabled = false;
-    })
-    .catch(err => {
-        console.error(err);
-        document.getElementById('processingSection').classList.add('hidden');
-        document.getElementById('errorSection').classList.remove('hidden');
-        document.getElementById('errorMessage').textContent = err.message;
-        decryptBtn.disabled = false;
-    });
-            // Simulate decryption process
-            // simulateDecryption();
-        }
-
-        function simulateDecryption() {
-            const terminal = document.getElementById('terminal');
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-
-            const logs = [
-                '[SYSTEM] Analyzing encrypted file...',
-                '[CRYPTO] Validating decryption key...',
-                '[CRYPTO] Key validation successful',
-                '[ENGINE] Initializing AES-256 decryption...',
-                '[ENGINE] Processing file blocks...',
-                '[ENGINE] Block 1/4 decrypted',
-                '[ENGINE] Block 2/4 decrypted',
-                '[ENGINE] Block 3/4 decrypted',
-                '[ENGINE] Block 4/4 decrypted',
-                '[SYSTEM] Verifying file integrity...',
-                '[SYSTEM] Decryption completed successfully'
-            ];
-
-            let currentLog = 0;
-            let progress = 0;
-
-            const processInterval = setInterval(() => {
-                if (currentLog < logs.length) {
-                    const logDiv = document.createElement('div');
-                    logDiv.className = 'typewriter';
-                    logDiv.textContent = logs[currentLog];
-                    terminal.appendChild(logDiv);
-                    terminal.scrollTop = terminal.scrollHeight;
-                    currentLog++;
+            fetch("/decrypt", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken
                 }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Dekripsi gagal di server.");
+                return response.blob();
+            })
+            .then(responseBlob => {
+                blob = responseBlob;
+                const originalName = selectedFile.name.replace('.enc', '');
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = originalName;
+                a.click();
 
-                progress += 9;
-                if (progress > 100) progress = 100;
-
-                progressBar.style.width = progress + '%';
-                progressText.textContent = progress + '%';
-
-                if (progress >= 100 && currentLog >= logs.length) {
-                    clearInterval(processInterval);
-
-                    // Simulate random success/failure
-                    const success = Math.random() > 0.3; // 70% success rate
-
-                    setTimeout(() => {
-                        if (success) {
-                            showDecryptionSuccess();
-                        } else {
-                            showDecryptionError();
-                        }
-                    }, 1000);
-                }
-            }, 300);
-        }
-
-        function showDecryptionSuccess() {
-            document.getElementById('processingSection').classList.add('hidden');
-            document.getElementById('downloadSection').classList.remove('hidden');
-
-            // Create a demo decrypted file
-            const originalName = selectedFile.name.replace('.enc', '');
-            const content = `This is a decrypted file: ${originalName}\nDecrypted at: ${new Date().toLocaleString()}\nOriginal size: ${selectedFile.size} bytes`;
-            blob = new Blob([content], { type: 'text/plain' });
-
-            decryptBtn.disabled = false;
-        }
-
-        function showDecryptionError() {
-            document.getElementById('processingSection').classList.add('hidden');
-            document.getElementById('errorSection').classList.remove('hidden');
-
-            const errors = [
-                'Invalid decryption key provided',
-                'File corruption detected',
-                'Unsupported encryption algorithm',
-                'Key length insufficient for this file'
-            ];
-
-            document.getElementById('errorMessage').textContent = errors[Math.floor(Math.random() * errors.length)];
-            decryptBtn.disabled = false;
+                document.getElementById('processingSection').classList.add('hidden');
+                document.getElementById('downloadSection').classList.remove('hidden');
+                decryptBtn.disabled = false;
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('processingSection').classList.add('hidden');
+                document.getElementById('errorSection').classList.remove('hidden');
+                document.getElementById('errorMessage').textContent = err.message;
+                decryptBtn.disabled = false;
+            });
         }
 
         // Download functionality
@@ -568,19 +525,15 @@
             document.getElementById('errorSection').classList.add('hidden');
             document.getElementById('terminalSection').classList.add('hidden');
             const terminal = document.getElementById('terminal');
-            terminal.innerHTML = '<div class="text-green-400">[SYSTEM] Decryption engine initialized...</div>';
+            terminal.innerHTML = '<div class="text-green-500">[SISTEM] Engine dekripsi diinisialisasi...</div>';
         });
 
-        // Initialize
-        createMatrixRain();
+        Initialize
+        enhanceFloatingShapes();
 
         // Handle window resize
         window.addEventListener('resize', function() {
-            const canvas = document.querySelector('#matrixBg canvas');
-            if (canvas) {
-                canvas.remove();
-                createMatrixRain();
-            }
+            enhanceFloatingShapes();
         });
     </script>
 </body>
