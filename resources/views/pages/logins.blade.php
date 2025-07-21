@@ -309,8 +309,15 @@
                 if (data.success) {
                     showMessage('Autentikasi berhasil! Mengalihkan...', 'success');
                     setTimeout(() => {
-                        alert('Login berhasil! Dalam aplikasi nyata, Anda akan diarahkan ke dashboard.');
-                        window.location.href = '/dashboard';
+                        const role = data.user.role;
+                        if (role === 'admin') {
+                            alert('Login berhasil! Dalam aplikasi nyata, Anda akan diarahkan ke dashboard.');
+                            window.location.href = '/dashboard';
+
+                        }else if (role === 'pengguna') {
+                            alert('Login berhasil! Dalam aplikasi nyata, Anda akan diarahkan ke dashboard.');
+                            window.location.href = '/dekripsi';
+                        }
                     }, 1500);
                 } else {
                     showMessage('Username/Email atau password salah!', 'error');

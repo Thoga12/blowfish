@@ -6,6 +6,9 @@ use App\Models\FileLogs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use phpseclib3\Crypt\Blowfish;
+use phpseclib3\Crypt\Common\SymmetricKey;
+use phpseclib3\Crypt\Engine;
+
 
 class EncryptedsControllers extends Controller
 {
@@ -23,13 +26,15 @@ class EncryptedsControllers extends Controller
         // $key = $request->input('key');
 
         $data = file_get_contents($file);
-        // $originalSize = strlen($data); 
+        // $originalSize = strlen($data);
 
         $iv = random_bytes(8); // Blowfish CBC pakai IV 8 byte
         $key = $request->key;
 
         // Inisialisasi Blowfish
+        // SymmetricKey::setPreferredEngine(\phpseclib3\Crypt\Engine::ENGINE_OPENSSL);
         $blowfish = new Blowfish('cbc');
+        $blowfish->setPreferredEngine($blowfish::ENGINE_OPENSSL);
         $blowfish->setKey($key);
         $blowfish->setIV($iv);
 
@@ -44,7 +49,7 @@ class EncryptedsControllers extends Controller
         //     Log::error("Enkripsi gagal, openssl_encrypt() menghasilkan false");
         //     return response("Encryption failed", 500);
         // }
-        
+
         if (!$encrypted) {
             return response("Encryption failed", 500);
         }
@@ -56,7 +61,7 @@ class EncryptedsControllers extends Controller
         // $output = base64_encode($output);
         // Log::info("Original size: $originalSize bytes");
         // Log::info("Encrypted size: $encryptedSize bytes");
-        
+
         // $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length("BF-CBC"));
         // $encrypted = openssl_encrypt($data, "BF-CBC", $key, OPENSSL_RAW_DATA, $iv);
         // $output = $iv . $encrypted;
@@ -71,7 +76,7 @@ class EncryptedsControllers extends Controller
             ->header('Content-Disposition', 'attachment; filename="' . $file->getClientOriginalName() . '.enc"');
     }
 
-    
+
     public function decrypt(Request $request)
 {
     $request->validate([
@@ -92,6 +97,8 @@ class EncryptedsControllers extends Controller
 
 
     $blowfish = new Blowfish('cbc');
+    $blowfish->setPreferredEngine($blowfish::ENGINE_OPENSSL);
+
         $blowfish->setKey($key);
         $blowfish->setIV($iv);
     // $decrypted = openssl_decrypt($encryptedData, "BF-CBC", $key, OPENSSL_RAW_DATA, $iv);
